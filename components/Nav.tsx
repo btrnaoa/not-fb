@@ -1,20 +1,21 @@
 'use client';
 
+import { Loader2, LogOut } from 'lucide-react';
 import { signIn, signOut, useSession } from 'next-auth/react';
 import Image from 'next/image';
+import { Button } from './ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from './ui/dropdown-menu';
-import { LogOut } from 'lucide-react';
 
 export default function Nav() {
   const { data: session, status } = useSession();
-  if (status === 'authenticated') {
-    return (
-      <div className="flex justify-end mx-2 my-4">
+  return (
+    <div className="flex justify-end mx-2 my-4">
+      {status === 'authenticated' ? (
         <DropdownMenu>
           <DropdownMenuTrigger>
             {session.user.image && (
@@ -30,18 +31,19 @@ export default function Nav() {
           <DropdownMenuContent>
             <DropdownMenuItem>
               <LogOut className="w-4 h-4 mr-2 text-muted-foreground" />
-              <button type="button" onClick={() => signOut()}>
-                Log out
-              </button>
+              <button onClick={() => signOut()}>Log out</button>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
-      </div>
-    );
-  }
-  return (
-    <button type="button" onClick={() => signIn()}>
-      Log in
-    </button>
+      ) : status === 'loading' ? (
+        <Button disabled>
+          <Loader2 className="w-4 h-4 animate-spin" />
+        </Button>
+      ) : (
+        <Button type="button" onClick={() => signIn()}>
+          Log in
+        </Button>
+      )}
+    </div>
   );
 }

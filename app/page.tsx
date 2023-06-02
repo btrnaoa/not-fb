@@ -1,11 +1,26 @@
-import { getServerSession } from 'next-auth';
-import { authOptions } from './api/auth/[...nextauth]/route';
+import PostFeed from '@/components/PostFeed';
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient();
+
+async function getPosts() {
+  const posts = await prisma.post.findMany({
+    include: {
+      user: {
+        select: {
+          name: true,
+          image: true,
+        },
+      },
+    },
+    orderBy: {
+      createdAt: 'desc',
+    },
+  });
+  return posts;
+}
 
 export default async function Home() {
-  const session = await getServerSession(authOptions);
-  return (
-    <main className="flex flex-col items-center justify-center min-h-screen">
-      <h1>{session ? 'Welcome!' : 'Hello, World!'}</h1>
-    </main>
-  );
+  const posts = await getPosts();
+  return <PostFeed posts={posts} />;
 }
