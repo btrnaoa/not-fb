@@ -2,14 +2,21 @@
 
 import { signIn, signOut, useSession } from 'next-auth/react';
 import Image from 'next/image';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from './ui/dropdown-menu';
+import { LogOut } from 'lucide-react';
 
 export default function Nav() {
   const { data: session, status } = useSession();
   if (status === 'authenticated') {
     return (
-      <div>
-        {session.user && (
-          <div className="flex items-center gap-2">
+      <div className="flex justify-end mx-2 my-4">
+        <DropdownMenu>
+          <DropdownMenuTrigger>
             {session.user.image && (
               <Image
                 className="rounded-full w-9 h-9"
@@ -19,18 +26,22 @@ export default function Nav() {
                 alt="user profile"
               />
             )}
-            <p className="text-sm font-bold">{session.user.name}</p>
-          </div>
-        )}
-        <button type="button" onClick={() => signOut()}>
-          Sign out
-        </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent>
+            <DropdownMenuItem>
+              <LogOut className="w-4 h-4 mr-2 text-muted-foreground" />
+              <button type="button" onClick={() => signOut()}>
+                Log out
+              </button>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
     );
   }
   return (
     <button type="button" onClick={() => signIn()}>
-      Sign in
+      Log in
     </button>
   );
 }

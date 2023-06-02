@@ -52,7 +52,7 @@ export default async function NewPost() {
             alt="user avatar"
           />
         )}
-        <span className="flex items-center flex-grow h-full px-4 text-gray-400 rounded-full bg-gray-50">
+        <span className="flex items-center flex-grow h-full px-4 text-sm rounded-full text-muted-foreground bg-muted">
           What&apos;s on your mind?
         </span>
       </DialogTrigger>
