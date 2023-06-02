@@ -22,5 +22,7 @@ async function getPosts() {
 
 export default async function Home() {
   const posts = await getPosts();
+
+  /* @ts-expect-error Server Component */
   return <PostFeed posts={posts} />;
 }

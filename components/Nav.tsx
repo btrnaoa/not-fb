@@ -30,8 +30,16 @@ export default function Nav() {
           </DropdownMenuTrigger>
           <DropdownMenuContent>
             <DropdownMenuItem>
-              <LogOut className="w-4 h-4 mr-2 text-muted-foreground" />
-              <button onClick={() => signOut()}>Log out</button>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="justify-start w-full"
+                onClick={() => signOut()}
+              >
+                <LogOut className="w-4 h-4 mr-2 text-muted-foreground" />
+                Log out
+              </Button>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
