@@ -14,8 +14,23 @@ model Post {
   id        String   @id @default(cuid())
   content   String
   createdAt DateTime @default(now())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  likes Like[]
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Like {
+  id String @id @default(cuid())
+
+  postId String
+  post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([postId, userId])
 }
 
 model Account {
@@ -54,6 +69,7 @@ model User {
   accounts      Account[]
   sessions      Session[]
   posts         Post[]
+  likes         Like[]
 }
 
 model VerificationToken {

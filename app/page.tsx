@@ -6,6 +6,11 @@ const prisma = new PrismaClient();
 async function getPosts() {
   const posts = await prisma.post.findMany({
     include: {
+      likes: {
+        select: {
+          userId: true,
+        },
+      },
       user: {
         select: {
           name: true,
