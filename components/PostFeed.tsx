@@ -1,9 +1,9 @@
+import { createPost } from '@/actions';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
-import { Post, PrismaClient } from '@prisma/client';
+import { Post } from '@prisma/client';
 import { IconThumbUpFilled } from '@tabler/icons-react';
 import { getServerSession } from 'next-auth';
 import Image from 'next/image';
-import { redirect } from 'next/navigation';
 import LikeButton from './LikeButton';
 import PostDropdownMenu from './PostDropdownMenu';
 import PostModal from './PostModal';
@@ -23,8 +23,6 @@ type PostFeedProps = {
   })[];
 };
 
-const prisma = new PrismaClient();
-
 function CreatePostModalTrigger() {
   return (
     <Button
@@ -39,26 +37,6 @@ function CreatePostModalTrigger() {
 export default async function PostFeed({ posts }: PostFeedProps) {
   const session = await getServerSession(authOptions);
   const userId = session?.user.id;
-
-  const createPost = async (data: FormData) => {
-    'use server';
-
-    const content = data.get('content')?.toString();
-    if (content) {
-      await prisma.post.create({
-        data: {
-          content,
-          user: {
-            connect: {
-              id: userId,
-            },
-          },
-        },
-      });
-      redirect('/');
-    }
-  };
-
   return (
     <>
       <div className="flex h-10 gap-2 px-2 mx-auto sm:px-0 sm:max-w-prose">

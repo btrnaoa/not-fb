@@ -1,8 +1,5 @@
-import { authOptions } from '@/app/api/auth/[...nextauth]/route';
-import { PrismaClient } from '@prisma/client';
+import { editPost } from '@/actions';
 import { MoreVertical } from 'lucide-react';
-import { getServerSession } from 'next-auth';
-import { redirect } from 'next/navigation';
 import DeletePostButton from './DeletePostButton';
 import PostModal from './PostModal';
 import { Button } from './ui/button';
@@ -19,42 +16,19 @@ type PostDropdownMenuProps = {
   initialContent: string;
 };
 
-const prisma = new PrismaClient();
-
 export default async function PostDropdownMenu({
   postId,
   initialContent,
 }: PostDropdownMenuProps) {
-  const session = await getServerSession(authOptions);
-
-  const editPost = async (data: FormData) => {
-    'use server';
-
-    const content = data.get('content')?.toString();
-    if (content) {
-      await prisma.user.update({
-        where: {
-          id: session?.user.id,
-        },
-        data: {
-          posts: {
-            update: {
-              where: {
-                id: postId,
-              },
-              data: {
-                content,
-              },
-            },
-          },
-        },
-      });
-      redirect('/');
-    }
-  };
-
   return (
-    <PostModal actionLabel="Edit" content={initialContent} mutateFn={editPost}>
+    <PostModal
+      actionLabel="Edit"
+      content={initialContent}
+      mutateFn={async (formData) => {
+        'use server';
+        return editPost(formData, postId);
+      }}
+    >
       <DropdownMenu>
         <DropdownMenuTrigger className="self-start">
           <MoreVertical className="w-4 h-4 text-muted-foreground" />

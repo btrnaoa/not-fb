@@ -5,6 +5,7 @@ import { PrismaClient } from '@prisma/client';
 import { getServerSession as originalGetServerSession } from 'next-auth';
 import { revalidatePath } from 'next/cache';
 import { cookies, headers } from 'next/headers';
+import { redirect } from 'next/navigation';
 
 const prisma = new PrismaClient();
 
@@ -24,6 +25,51 @@ const getServerSession = async () => {
   const session = await originalGetServerSession(req, res, authOptions);
   return session;
 };
+
+export async function createPost(data: FormData) {
+  const session = await getServerSession();
+
+  const content = data.get('content')?.toString();
+  if (content) {
+    await prisma.post.create({
+      data: {
+        content,
+        user: {
+          connect: {
+            id: session?.user.id,
+          },
+        },
+      },
+    });
+    redirect('/');
+  }
+}
+
+export async function editPost(data: FormData, postId: string) {
+  const session = await getServerSession();
+
+  const content = data.get('content')?.toString();
+  if (content) {
+    await prisma.user.update({
+      where: {
+        id: session?.user.id,
+      },
+      data: {
+        posts: {
+          update: {
+            where: {
+              id: postId,
+            },
+            data: {
+              content,
+            },
+          },
+        },
+      },
+    });
+    redirect('/');
+  }
+}
 
 export async function deletePost(postId: string) {
   await prisma.post.delete({ where: { id: postId } });
