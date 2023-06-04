@@ -26,6 +26,28 @@ const getServerSession = async () => {
   return session;
 };
 
+export async function getPosts() {
+  const posts = await prisma.post.findMany({
+    include: {
+      likes: {
+        select: {
+          userId: true,
+        },
+      },
+      user: {
+        select: {
+          name: true,
+          image: true,
+        },
+      },
+    },
+    orderBy: {
+      createdAt: 'desc',
+    },
+  });
+  return posts;
+}
+
 export async function createPost(data: FormData) {
   const session = await getServerSession();
 
@@ -109,4 +131,86 @@ export async function likePost(postId: string) {
     }
     revalidatePath('/');
   }
+}
+
+export async function getComments(postId: string) {
+  const comments = await prisma.comment.findMany({
+    where: { postId },
+    select: {
+      id: true,
+      content: true,
+      post: {
+        select: {
+          userId: true,
+        },
+      },
+      user: {
+        select: {
+          id: true,
+          name: true,
+          image: true,
+        },
+      },
+    },
+    orderBy: {
+      createdAt: 'asc',
+    },
+  });
+  return comments;
+}
+
+export async function addComment(data: FormData, postId: string) {
+  const session = await getServerSession();
+  const userId = session?.user.id;
+
+  const content = data.get('content')?.toString();
+  if (content && userId) {
+    await prisma.comment.create({
+      data: {
+        content,
+        post: {
+          connect: {
+            id: postId,
+          },
+        },
+        user: {
+          connect: {
+            id: userId,
+          },
+        },
+      },
+    });
+    revalidatePath('/');
+  }
+}
+
+export async function editComment(data: FormData, commentId: string) {
+  const session = await getServerSession();
+
+  const content = data.get('content')?.toString();
+  if (content) {
+    await prisma.user.update({
+      where: {
+        id: session?.user.id,
+      },
+      data: {
+        comments: {
+          update: {
+            where: {
+              id: commentId,
+            },
+            data: {
+              content,
+            },
+          },
+        },
+      },
+    });
+    revalidatePath('/');
+  }
+}
+
+export async function deleteComment(commentId: string) {
+  await prisma.comment.delete({ where: { id: commentId } });
+  revalidatePath('/');
 }

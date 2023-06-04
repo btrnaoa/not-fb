@@ -1,4 +1,3 @@
-import { ComponentType } from 'react';
 import { Button } from './ui/button';
 import {
   Dialog,
@@ -9,41 +8,41 @@ import {
 } from './ui/dialog';
 import { Textarea } from './ui/textarea';
 
-type PostModalProps = {
-  actionLabel: 'Create' | 'Edit';
-  content?: string;
+type TextInputModal = {
+  title: string;
+  initialContent?: string;
+  contentPlaceholder?: string;
+  buttonLabel: string;
   mutateFn: (data: FormData) => Promise<void>;
+  modalTrigger?: React.ReactNode;
   children?: React.ReactNode;
-  ModalTrigger?: ComponentType;
 };
 
-export default function PostModal({
-  actionLabel,
-  content,
+export default function TextInputModal({
+  title,
+  initialContent = '',
+  contentPlaceholder = '',
+  buttonLabel,
   mutateFn,
+  modalTrigger,
   children,
-  ModalTrigger,
-}: PostModalProps) {
+}: TextInputModal) {
   return (
     <Dialog>
       {children}
-      {ModalTrigger && (
-        <DialogTrigger asChild>
-          <ModalTrigger />
-        </DialogTrigger>
-      )}
+      {modalTrigger && <DialogTrigger asChild>{modalTrigger}</DialogTrigger>}
       <DialogContent>
         <DialogHeader>
-          <DialogTitle className="text-center">{actionLabel} post</DialogTitle>
+          <DialogTitle className="text-center">{title}</DialogTitle>
         </DialogHeader>
         <form action={mutateFn}>
           <div className="flex flex-col gap-4">
             <Textarea
               name="content"
-              defaultValue={content}
-              placeholder="What's on your mind?"
+              defaultValue={initialContent}
+              placeholder={contentPlaceholder}
             />
-            <Button type="submit">Post</Button>
+            <Button type="submit">{buttonLabel}</Button>
           </div>
         </form>
       </DialogContent>

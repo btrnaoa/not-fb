@@ -1,11 +1,16 @@
+import { deletePost, editPost } from '@/actions';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { Post } from '@prisma/client';
 import { IconThumbUpFilled } from '@tabler/icons-react';
 import { getServerSession } from 'next-auth';
 import Image from 'next/image';
-import LikeButton from './LikeButton';
-import PostDropdownMenu from './PostDropdownMenu';
+import DropdownMenu from './DropdownMenu';
+import DropdownMenuItemButton from './DropdownMenu/DropdownMenuItemButton';
+import PostCardToggle from './PostCardToggle';
+import PostComments from './PostComments';
+import TextInputModal from './TextInputModal';
 import { Card, CardContent, CardHeader } from './ui/card';
+import { DropdownMenuItem } from './ui/dropdown-menu';
 import { Separator } from './ui/separator';
 
 type HeaderProps = {
@@ -57,8 +62,36 @@ function Header({
         {userName && <p className="text-sm font-semibold">{userName}</p>}
       </div>
       {renderDropdownMenu && (
-        // @ts-expect-error Server Component
-        <PostDropdownMenu postId={postId} initialContent={initialContent} />
+        <TextInputModal
+          title="Edit post"
+          initialContent={initialContent}
+          contentPlaceholder="What's on your mind?"
+          buttonLabel="Post"
+          mutateFn={async (formData) => {
+            'use server';
+            return editPost(formData, postId);
+          }}
+        >
+          <DropdownMenu
+            dropdownMenuItemModalTrigger={
+              <DropdownMenuItem>
+                <DropdownMenuItemButton>Edit</DropdownMenuItemButton>
+              </DropdownMenuItem>
+            }
+          >
+            <DropdownMenuItem>
+              <DropdownMenuItemButton
+                className="text-destructive"
+                handleClick={async () => {
+                  'use server';
+                  return deletePost(postId);
+                }}
+              >
+                Delete
+              </DropdownMenuItemButton>
+            </DropdownMenuItem>
+          </DropdownMenu>
+        </TextInputModal>
       )}
     </div>
   );
@@ -77,9 +110,10 @@ function Content({ postId, content, likeCount, liked }: ContentProps) {
         </div>
       )}
       <Separator />
-      <div className="grid grid-flow-col justify-stretch">
-        <LikeButton postId={postId} liked={liked} />
-      </div>
+      <PostCardToggle postId={postId} liked={liked}>
+        {/* @ts-expect-error Server Component */}
+        <PostComments postId={postId} />
+      </PostCardToggle>
     </div>
   );
 }
