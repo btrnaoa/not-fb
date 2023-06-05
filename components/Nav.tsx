@@ -14,7 +14,7 @@ import {
 export default function Nav() {
   const { data: session, status } = useSession();
   return (
-    <div className="flex justify-end mx-2 my-4">
+    <div className="flex justify-end h-10 mx-2 my-4">
       {status === 'authenticated' ? (
         <DropdownMenu>
           <DropdownMenuTrigger>
@@ -44,11 +44,11 @@ export default function Nav() {
           </DropdownMenuContent>
         </DropdownMenu>
       ) : status === 'loading' ? (
-        <Button disabled>
+        <Button variant="ghost" disabled>
           <Loader2 className="w-4 h-4 animate-spin" />
         </Button>
       ) : (
-        <Button type="button" onClick={() => signIn()}>
+        <Button type="button" variant="ghost" onClick={() => signIn()}>
           Log in
         </Button>
       )}
