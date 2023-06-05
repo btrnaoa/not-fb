@@ -1,6 +1,7 @@
 import { PrismaAdapter } from '@next-auth/prisma-adapter';
 import { PrismaClient } from '@prisma/client';
 import NextAuth, { NextAuthOptions } from 'next-auth';
+import GithubProvider, { GithubProfile } from 'next-auth/providers/github';
 import GoogleProvider, { GoogleProfile } from 'next-auth/providers/google';
 
 const prisma = new PrismaClient();
@@ -8,6 +9,10 @@ const prisma = new PrismaClient();
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
   providers: [
+    GithubProvider({
+      clientId: process.env.GITHUB_CLIENT_ID!,
+      clientSecret: process.env.GITHUB_CLIENT_SECRET!,
+    }),
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
@@ -19,7 +24,7 @@ export const authOptions: NextAuthOptions = {
         const { email_verified } = profile as GoogleProfile;
         return email_verified;
       }
-      return false;
+      return account?.provider === 'github';
     },
     async session({ session, user }) {
       session.user.id = user.id;
