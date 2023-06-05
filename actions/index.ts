@@ -29,6 +29,11 @@ const getServerSession = async () => {
 export async function getPosts() {
   const posts = await prisma.post.findMany({
     include: {
+      _count: {
+        select: {
+          comments: true,
+        },
+      },
       likes: {
         select: {
           userId: true,

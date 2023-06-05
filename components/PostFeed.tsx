@@ -7,6 +7,9 @@ import UserTextInputModal from './UserTextInputModal';
 
 type PostFeedProps = {
   posts: (Post & {
+    _count: {
+      comments: number;
+    };
     likes: {
       userId: string;
     }[];

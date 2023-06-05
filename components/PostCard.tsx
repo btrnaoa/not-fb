@@ -1,4 +1,4 @@
-import { deletePost, editPost } from '@/actions';
+import { addComment, deletePost, editPost } from '@/actions';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { Post } from '@prisma/client';
 import { IconThumbUpFilled } from '@tabler/icons-react';
@@ -12,6 +12,7 @@ import DropdownMenuItemButton from './DropdownMenu/DropdownMenuItemButton';
 import PostCardToggle from './PostCardToggle';
 import PostComments from './PostComments';
 import TextInputModal from './TextInputModal';
+import UserTextInputModal from './UserTextInputModal';
 import { Card, CardContent, CardHeader } from './ui/card';
 import { DropdownMenuItem } from './ui/dropdown-menu';
 import { Separator } from './ui/separator';
@@ -30,12 +31,15 @@ type HeaderProps = {
 type ContentProps = {
   postId: string;
   content: string;
-  likeCount: number;
-  liked: boolean;
+  likes: { userId: string }[];
+  renderComments: boolean;
 };
 
 type PostCardProps = {
   post: Post & {
+    _count: {
+      comments: number;
+    };
     likes: {
       userId: string;
     }[];
@@ -110,22 +114,46 @@ function Header({
   );
 }
 
-function Content({ postId, content, likeCount, liked }: ContentProps) {
+async function Content({
+  postId,
+  content,
+  likes,
+  renderComments,
+}: ContentProps) {
+  const session = await getServerSession(authOptions);
+  const userId = session?.user.id;
+
+  const liked = userId
+    ? likes.map((like) => like.userId).includes(userId)
+    : false;
+
   return (
     <div className="flex flex-col gap-4">
       <p className="text-sm whitespace-pre-line">{content}</p>
-      {likeCount > 0 && (
+      {likes.length > 0 && (
         <div className="flex">
           <div className="flex items-center justify-center w-5 h-5 mr-1.5 rounded-full bg-gradient-to-t from-indigo-600 to-indigo-400">
             <IconThumbUpFilled className="w-3.5 h-3.5 text-white" />
           </div>
-          <div className="text-sm text-muted-foreground">{likeCount}</div>
+          <div className="text-sm text-muted-foreground">{likes.length}</div>
         </div>
       )}
       <Separator />
       <PostCardToggle postId={postId} liked={liked}>
+        {session?.user.image && (
+          <UserTextInputModal
+            userImage={session.user.image}
+            title="Add comment"
+            placeholder="What's on your mind?"
+            buttonLabel="Post"
+            mutateFn={async (data) => {
+              'use server';
+              return addComment(data, postId);
+            }}
+          />
+        )}
         {/* @ts-expect-error Server Component */}
-        <PostComments postId={postId} />
+        {renderComments && <PostComments postId={postId} />}
       </PostCardToggle>
     </div>
   );
@@ -133,12 +161,6 @@ function Content({ postId, content, likeCount, liked }: ContentProps) {
 
 export default async function PostCard({ post }: PostCardProps) {
   const session = await getServerSession(authOptions);
-  const userId = session?.user.id;
-
-  const liked = userId
-    ? post.likes.map((like) => like.userId).includes(userId)
-    : false;
-
   return (
     <Card>
       <CardHeader>
@@ -148,15 +170,16 @@ export default async function PostCard({ post }: PostCardProps) {
           initialContent={post.content}
           userName={post.user.name}
           userImage={post.user.image}
-          renderDropdownMenu={post.userId === userId}
+          renderDropdownMenu={post.userId === session?.user.id}
         />
       </CardHeader>
       <CardContent>
+        {/* @ts-expect-error Server Component */}
         <Content
           postId={post.id}
           content={post.content}
-          likeCount={post.likes.length}
-          liked={liked}
+          likes={post.likes}
+          renderComments={post._count.comments > 0}
         />
       </CardContent>
     </Card>

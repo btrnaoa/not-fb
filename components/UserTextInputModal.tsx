@@ -33,7 +33,7 @@ export default function UserTextInputModal({
   mutateFn,
 }: UserTextInputModalProps) {
   return (
-    <div className="flex h-10 gap-2 px-2 mx-auto sm:px-0 sm:max-w-prose">
+    <div className="flex w-full h-10 gap-2 px-2 mx-auto sm:px-0 sm:max-w-prose">
       <Image
         className="w-10 rounded-full"
         src={userImage}
