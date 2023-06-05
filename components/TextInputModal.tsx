@@ -1,3 +1,6 @@
+'use client';
+
+import { useState } from 'react';
 import { Button } from './ui/button';
 import {
   Dialog,
@@ -27,15 +30,21 @@ export default function TextInputModal({
   modalTrigger,
   children,
 }: TextInputModal) {
+  const [open, setOpen] = useState(false);
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       {children}
       {modalTrigger && <DialogTrigger asChild>{modalTrigger}</DialogTrigger>}
       <DialogContent>
         <DialogHeader>
           <DialogTitle className="text-center">{title}</DialogTitle>
         </DialogHeader>
-        <form action={mutateFn}>
+        <form
+          action={async (data) => {
+            await mutateFn(data);
+            setOpen((prev) => !prev);
+          }}
+        >
           <div className="flex flex-col gap-4">
             <Textarea
               name="content"

@@ -5,7 +5,6 @@ import { PrismaClient } from '@prisma/client';
 import { getServerSession as originalGetServerSession } from 'next-auth';
 import { revalidatePath } from 'next/cache';
 import { cookies, headers } from 'next/headers';
-import { redirect } from 'next/navigation';
 
 const prisma = new PrismaClient();
 
@@ -68,7 +67,7 @@ export async function createPost(data: FormData) {
         },
       },
     });
-    redirect('/');
+    revalidatePath('/');
   }
 }
 
@@ -94,7 +93,7 @@ export async function editPost(data: FormData, postId: string) {
         },
       },
     });
-    redirect('/');
+    revalidatePath('/');
   }
 }
 
