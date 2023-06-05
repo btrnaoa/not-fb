@@ -94,7 +94,18 @@ export async function editPost(data: FormData, postId: string) {
 }
 
 export async function deletePost(postId: string) {
-  await prisma.post.delete({ where: { id: postId } });
+  const session = await getServerSession();
+
+  await prisma.user.update({
+    where: { id: session?.user.id },
+    data: {
+      posts: {
+        delete: {
+          id: postId,
+        },
+      },
+    },
+  });
   revalidatePath('/');
 }
 
@@ -211,6 +222,17 @@ export async function editComment(data: FormData, commentId: string) {
 }
 
 export async function deleteComment(commentId: string) {
-  await prisma.comment.delete({ where: { id: commentId } });
+  const session = await getServerSession();
+
+  await prisma.user.update({
+    where: { id: session?.user.id },
+    data: {
+      comments: {
+        delete: {
+          id: commentId,
+        },
+      },
+    },
+  });
   revalidatePath('/');
 }
