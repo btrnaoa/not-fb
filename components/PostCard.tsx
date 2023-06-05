@@ -2,6 +2,9 @@ import { deletePost, editPost } from '@/actions';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { Post } from '@prisma/client';
 import { IconThumbUpFilled } from '@tabler/icons-react';
+import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
+import { Clock } from 'lucide-react';
 import { getServerSession } from 'next-auth';
 import Image from 'next/image';
 import DropdownMenu from './DropdownMenu';
@@ -13,8 +16,11 @@ import { Card, CardContent, CardHeader } from './ui/card';
 import { DropdownMenuItem } from './ui/dropdown-menu';
 import { Separator } from './ui/separator';
 
+dayjs.extend(relativeTime);
+
 type HeaderProps = {
   postId: string;
+  postCreatedAt: Date;
   initialContent: string;
   userName: string | null;
   userImage: string | null;
@@ -42,6 +48,7 @@ type PostCardProps = {
 
 function Header({
   postId,
+  postCreatedAt,
   initialContent,
   userName,
   userImage,
@@ -59,7 +66,13 @@ function Header({
             alt="user avatar"
           />
         )}
-        {userName && <p className="text-sm font-semibold">{userName}</p>}
+        <div>
+          {userName && <div className="text-sm font-semibold">{userName}</div>}
+          <div className="flex items-center text-xs text-muted-foreground">
+            <Clock className="w-3 h-3 mr-1" />
+            <div>{dayjs(postCreatedAt).fromNow()}</div>
+          </div>
+        </div>
       </div>
       {renderDropdownMenu && (
         <TextInputModal
@@ -131,6 +144,7 @@ export default async function PostCard({ post }: PostCardProps) {
       <CardHeader>
         <Header
           postId={post.id}
+          postCreatedAt={post.createdAt}
           initialContent={post.content}
           userName={post.user.name}
           userImage={post.user.image}
