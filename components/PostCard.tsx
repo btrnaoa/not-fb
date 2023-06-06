@@ -8,7 +8,7 @@ import { Clock } from 'lucide-react';
 import { getServerSession } from 'next-auth';
 import Image from 'next/image';
 import DropdownMenu from './DropdownMenu';
-import DropdownMenuItemButton from './DropdownMenu/DropdownMenuItemButton';
+import PostCardButton from './PostCardButton';
 import PostCardToggle from './PostCardToggle';
 import PostComments from './PostComments';
 import TextInputModal from './TextInputModal';
@@ -92,12 +92,12 @@ function Header({
           <DropdownMenu
             dropdownMenuItemModalTrigger={
               <DropdownMenuItem>
-                <DropdownMenuItemButton>Edit</DropdownMenuItemButton>
+                <PostCardButton>Edit</PostCardButton>
               </DropdownMenuItem>
             }
           >
             <DropdownMenuItem>
-              <DropdownMenuItemButton
+              <PostCardButton
                 className="text-destructive"
                 handleClick={async () => {
                   'use server';
@@ -105,7 +105,7 @@ function Header({
                 }}
               >
                 Delete
-              </DropdownMenuItemButton>
+              </PostCardButton>
             </DropdownMenuItem>
           </DropdownMenu>
         </TextInputModal>

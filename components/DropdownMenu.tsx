@@ -1,10 +1,10 @@
 import { MoreVertical } from 'lucide-react';
-import { DialogTrigger } from '../ui/dialog';
+import { DialogTrigger } from './ui/dialog';
 import {
   DropdownMenu as _DropdownMenu,
   DropdownMenuContent,
   DropdownMenuTrigger,
-} from '../ui/dropdown-menu';
+} from './ui/dropdown-menu';
 
 type DropdownMenuProps = {
   dropdownMenuItemModalTrigger: React.ReactElement;

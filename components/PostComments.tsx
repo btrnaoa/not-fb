@@ -3,7 +3,7 @@ import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { getServerSession } from 'next-auth';
 import Image from 'next/image';
 import DropdownMenu from './DropdownMenu';
-import DropdownMenuItemButton from './DropdownMenu/DropdownMenuItemButton';
+import PostCardButton from './PostCardButton';
 import TextInputModal from './TextInputModal';
 import { DropdownMenuItem } from './ui/dropdown-menu';
 
@@ -55,12 +55,12 @@ export default async function PostComments({ postId }: PostCommentsProps) {
                 <DropdownMenu
                   dropdownMenuItemModalTrigger={
                     <DropdownMenuItem>
-                      <DropdownMenuItemButton>Edit</DropdownMenuItemButton>
+                      <PostCardButton>Edit</PostCardButton>
                     </DropdownMenuItem>
                   }
                 >
                   <DropdownMenuItem>
-                    <DropdownMenuItemButton
+                    <PostCardButton
                       className="text-destructive"
                       handleClick={async () => {
                         'use server';
@@ -68,7 +68,7 @@ export default async function PostComments({ postId }: PostCommentsProps) {
                       }}
                     >
                       Delete
-                    </DropdownMenuItemButton>
+                    </PostCardButton>
                   </DropdownMenuItem>
                 </DropdownMenu>
               </TextInputModal>

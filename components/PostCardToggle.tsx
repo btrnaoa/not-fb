@@ -1,8 +1,10 @@
 'use client';
 
+import { likePost } from '@/actions';
+import clsx from 'clsx';
+import { MessageSquare, ThumbsUp } from 'lucide-react';
 import { useState } from 'react';
-import CommentButton from './CommentButton';
-import LikeButton from './LikeButton';
+import PostCardButton from './PostCardButton';
 
 type PostCardToggle = {
   postId: string;
@@ -19,8 +21,21 @@ export default function PostCardToggle({
   return (
     <>
       <div className="grid grid-flow-col justify-stretch">
-        <LikeButton postId={postId} liked={liked} />
-        <CommentButton handleOnClick={() => setShowComments((prev) => !prev)} />
+        <PostCardButton
+          icon={<ThumbsUp />}
+          isHighlighted={liked}
+          handleClick={() => likePost(postId)}
+        >
+          <span className={clsx({ 'font-bold text-indigo-600': liked })}>
+            Like
+          </span>
+        </PostCardButton>
+        <PostCardButton
+          icon={<MessageSquare />}
+          handleClick={() => setShowComments((prev) => !prev)}
+        >
+          Comment
+        </PostCardButton>
       </div>
       {showComments && children}
     </>

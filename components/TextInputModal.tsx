@@ -17,7 +17,7 @@ type TextInputModal = {
   contentPlaceholder?: string;
   buttonLabel: string;
   mutateFn: (data: FormData) => Promise<void>;
-  modalTrigger?: React.ReactNode;
+  modalTrigger?: React.ReactElement;
   children?: React.ReactNode;
 };
 
