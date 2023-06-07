@@ -9,13 +9,12 @@ import { getServerSession } from 'next-auth';
 import Image from 'next/image';
 import DropdownMenu from './DropdownMenu';
 import PostCardButton from './PostCardButton';
-import PostCardToggle from './PostCardToggle';
+import PostCardFooter from './PostCardFooter';
 import PostComments from './PostComments';
 import TextInputModal from './TextInputModal';
 import UserTextInputModal from './UserTextInputModal';
-import { Card, CardContent, CardHeader } from './ui/card';
+import { Card, CardContent, CardFooter, CardHeader } from './ui/card';
 import { DropdownMenuItem } from './ui/dropdown-menu';
-import { Separator } from './ui/separator';
 
 dayjs.extend(relativeTime);
 
@@ -26,13 +25,6 @@ type HeaderProps = {
   userName: string | null;
   userImage: string | null;
   renderDropdownMenu: boolean;
-};
-
-type ContentProps = {
-  postId: string;
-  content: string;
-  likes: { userId: string }[];
-  renderComments: boolean;
 };
 
 type PostCardProps = {
@@ -114,53 +106,14 @@ function Header({
   );
 }
 
-async function Content({
-  postId,
-  content,
-  likes,
-  renderComments,
-}: ContentProps) {
+export default async function PostCard({ post }: PostCardProps) {
   const session = await getServerSession(authOptions);
   const userId = session?.user.id;
 
   const liked = userId
-    ? likes.map((like) => like.userId).includes(userId)
+    ? post.likes.map((like) => like.userId).includes(userId)
     : false;
 
-  return (
-    <div className="flex flex-col gap-4">
-      <p className="text-sm whitespace-pre-line">{content}</p>
-      {likes.length > 0 && (
-        <div className="flex">
-          <div className="flex items-center justify-center w-5 h-5 mr-1.5 rounded-full bg-gradient-to-t from-indigo-600 to-indigo-400">
-            <IconThumbUpFilled className="w-3.5 h-3.5 text-white" />
-          </div>
-          <div className="text-sm text-muted-foreground">{likes.length}</div>
-        </div>
-      )}
-      <Separator />
-      <PostCardToggle postId={postId} liked={liked}>
-        {session?.user.image && (
-          <UserTextInputModal
-            userImage={session.user.image}
-            title="Add comment"
-            placeholder="What's on your mind?"
-            buttonLabel="Post"
-            mutateFn={async (data) => {
-              'use server';
-              return addComment(data, postId);
-            }}
-          />
-        )}
-        {/* @ts-expect-error Server Component */}
-        {renderComments && <PostComments postId={postId} />}
-      </PostCardToggle>
-    </div>
-  );
-}
-
-export default async function PostCard({ post }: PostCardProps) {
-  const session = await getServerSession(authOptions);
   return (
     <Card>
       <CardHeader>
@@ -174,14 +127,44 @@ export default async function PostCard({ post }: PostCardProps) {
         />
       </CardHeader>
       <CardContent>
-        {/* @ts-expect-error Server Component */}
-        <Content
-          postId={post.id}
-          content={post.content}
-          likes={post.likes}
-          renderComments={post._count.comments > 0}
-        />
+        <p className="text-sm whitespace-pre-line">{post.content}</p>
       </CardContent>
+      <CardFooter>
+        <div className="grid w-full grid-cols-2">
+          <div className="flex items-center">
+            {post.likes.length > 0 && (
+              <>
+                <div className="flex items-center justify-center w-5 h-5 mr-1.5 rounded-full bg-gradient-to-t from-indigo-600 to-indigo-400">
+                  <IconThumbUpFilled className="w-3.5 h-3.5 text-white" />
+                </div>
+                <div className="text-sm text-muted-foreground">
+                  {post.likes.length}
+                </div>
+              </>
+            )}
+          </div>
+          <PostCardFooter
+            postId={post.id}
+            liked={liked}
+            commentCount={post._count.comments}
+          >
+            <div className="flex flex-col w-full col-span-2 mt-4">
+              {/* @ts-expect-error Server Component */}
+              <UserTextInputModal
+                title="Add comment"
+                placeholder="What's on your mind?"
+                buttonLabel="Post"
+                mutateFn={async (formData) => {
+                  'use server';
+                  return addComment(formData, post.id);
+                }}
+              />
+              {/* @ts-expect-error Server Component */}
+              {post._count.comments > 0 && <PostComments postId={post.id} />}
+            </div>
+          </PostCardFooter>
+        </div>
+      </CardFooter>
     </Card>
   );
 }

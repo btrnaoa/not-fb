@@ -1,9 +1,10 @@
+import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+import { getServerSession } from 'next-auth';
 import Image from 'next/image';
 import TextInputModal from './TextInputModal';
 import { Button } from './ui/button';
 
 type UserTextInputModalProps = {
-  userImage: string;
   title: string;
   placeholder: string;
   buttonLabel: string;
@@ -25,22 +26,24 @@ function UserTextModalTrigger({ buttonLabel }: UserTextInputModalTriggerProps) {
   );
 }
 
-export default function UserTextInputModal({
-  userImage,
+export default async function UserTextInputModal({
   title,
   placeholder,
   buttonLabel,
   mutateFn,
 }: UserTextInputModalProps) {
+  const session = await getServerSession(authOptions);
   return (
     <div className="flex w-full h-10 gap-2 px-2 mx-auto sm:px-0 sm:max-w-prose">
-      <Image
-        className="w-10 rounded-full"
-        src={userImage}
-        width={40}
-        height={40}
-        alt="user avatar"
-      />
+      {session?.user.image && (
+        <Image
+          className="w-10 rounded-full"
+          src={session.user.image}
+          width={40}
+          height={40}
+          alt="user avatar"
+        />
+      )}
       <TextInputModal
         title={title}
         contentPlaceholder={placeholder}
