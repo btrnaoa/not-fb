@@ -5,6 +5,7 @@ import { PrismaClient } from '@prisma/client';
 import { getServerSession as originalGetServerSession } from 'next-auth';
 import { revalidatePath } from 'next/cache';
 import { cookies, headers } from 'next/headers';
+import { redirect } from 'next/navigation';
 
 const prisma = new PrismaClient();
 
@@ -54,6 +55,9 @@ export async function getPosts() {
 
 export async function createPost(data: FormData) {
   const session = await getServerSession();
+  if (!session) {
+    redirect('/api/auth/signin');
+  }
 
   const content = data.get('content')?.toString();
   if (content) {
@@ -62,7 +66,7 @@ export async function createPost(data: FormData) {
         content,
         user: {
           connect: {
-            id: session?.user.id,
+            id: session.user.id,
           },
         },
       },
@@ -115,8 +119,11 @@ export async function deletePost(postId: string) {
 
 export async function likePost(postId: string) {
   const session = await getServerSession();
+  if (!session) {
+    redirect('/api/auth/signin');
+  }
 
-  const userId = session?.user.id;
+  const userId = session.user.id;
   if (userId) {
     const like = await prisma.like.findUnique({
       where: {
@@ -176,10 +183,12 @@ export async function getComments(postId: string) {
 
 export async function addComment(data: FormData, postId: string) {
   const session = await getServerSession();
-  const userId = session?.user.id;
+  if (!session) {
+    redirect('/api/auth/signin');
+  }
 
   const content = data.get('content')?.toString();
-  if (content && userId) {
+  if (content) {
     await prisma.comment.create({
       data: {
         content,
@@ -190,7 +199,7 @@ export async function addComment(data: FormData, postId: string) {
         },
         user: {
           connect: {
-            id: userId,
+            id: session.user.id,
           },
         },
       },
