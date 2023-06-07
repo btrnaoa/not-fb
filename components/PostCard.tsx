@@ -131,7 +131,7 @@ export default async function PostCard({ post }: PostCardProps) {
       </CardContent>
       <CardFooter>
         <div className="grid w-full grid-cols-2">
-          <div className="flex items-center">
+          <div className="flex items-center h-10">
             {post.likes.length > 0 && (
               <>
                 <div className="flex items-center justify-center w-5 h-5 mr-1.5 rounded-full bg-gradient-to-t from-indigo-600 to-indigo-400">
