@@ -3,8 +3,7 @@
 import { likePost } from '@/actions';
 import clsx from 'clsx';
 import { MessageSquare, ThumbsUp } from 'lucide-react';
-import { useState } from 'react';
-import PostCardButton from './PostCardButton';
+import { useState, useTransition } from 'react';
 import { Button } from './ui/button';
 import { Separator } from './ui/separator';
 
@@ -22,6 +21,7 @@ export default function PostCardFooter({
   children,
 }: PostCardFooterProps) {
   const [isExpanded, setIsExpanded] = useState(false);
+  const [_, startTransition] = useTransition();
 
   const handleClick = () => {
     setIsExpanded((prev) => !prev);
@@ -41,18 +41,25 @@ export default function PostCardFooter({
       <div className="col-span-2">
         <Separator />
         <div className="grid grid-flow-col mt-4 justify-stretch">
-          <PostCardButton
-            icon={<ThumbsUp />}
-            isHighlighted={liked}
-            handleClick={() => likePost(postId)}
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={() => startTransition(() => likePost(postId))}
           >
+            <ThumbsUp
+              className={clsx('w-4 h-4 mr-2', {
+                'text-indigo-600 fill-current': liked,
+              })}
+            />
             <span className={clsx({ 'font-bold text-indigo-600': liked })}>
               Like
             </span>
-          </PostCardButton>
-          <PostCardButton icon={<MessageSquare />} handleClick={handleClick}>
+          </Button>
+          <Button type="button" variant="ghost" size="sm" onClick={handleClick}>
+            <MessageSquare className="w-4 h-4 mr-2" />
             Comment
-          </PostCardButton>
+          </Button>
         </div>
       </div>
       {isExpanded && children}

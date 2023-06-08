@@ -8,13 +8,13 @@ import { Clock } from 'lucide-react';
 import { getServerSession } from 'next-auth';
 import Image from 'next/image';
 import DropdownMenu from './DropdownMenu';
-import PostCardButton from './PostCardButton';
+import DropdownMenuItem from './DropdownMenuItem';
 import PostCardFooter from './PostCardFooter';
 import PostComments from './PostComments';
 import TextInputModal from './TextInputModal';
 import UserTextInputModal from './UserTextInputModal';
 import { Card, CardContent, CardFooter, CardHeader } from './ui/card';
-import { DropdownMenuItem } from './ui/dropdown-menu';
+import { DropdownMenuItem as _DropdownMenuItem } from './ui/dropdown-menu';
 
 dayjs.extend(relativeTime);
 
@@ -83,21 +83,17 @@ function Header({
         >
           <DropdownMenu
             dropdownMenuItemModalTrigger={
-              <DropdownMenuItem>
-                <PostCardButton>Edit</PostCardButton>
-              </DropdownMenuItem>
+              <_DropdownMenuItem>Edit</_DropdownMenuItem>
             }
           >
-            <DropdownMenuItem>
-              <PostCardButton
-                className="text-destructive"
-                handleClick={async () => {
-                  'use server';
-                  return deletePost(postId);
-                }}
-              >
-                Delete
-              </PostCardButton>
+            <DropdownMenuItem
+              handleClick={async () => {
+                'use server';
+                return deletePost(postId);
+              }}
+              className="text-destructive focus:bg-destructive focus:text-destructive-foreground"
+            >
+              Delete
             </DropdownMenuItem>
           </DropdownMenu>
         </TextInputModal>
