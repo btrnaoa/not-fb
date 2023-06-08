@@ -55,7 +55,7 @@ function Header({
       <div className="flex gap-2">
         {userImage && (
           <Image
-            className="w-8 rounded-full"
+            className="w-8 h-8 rounded-full"
             src={userImage}
             width={32}
             height={32}
